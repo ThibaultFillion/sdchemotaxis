@@ -305,7 +305,7 @@ class Simulation
         // checks the sampling conditions and sample if necessary
         if(
             (cell_jumped && sample_on_cell_jump) ||
-            (sampling_interval>=0 && t - trajectory_times[0]>=sampling_interval)||
+            (sampling_interval>=0 && t - trajectory_times.back()>=sampling_interval)||
             (sample_final_state && complete)
             )
             {
