@@ -1,7 +1,7 @@
 #include<random>
 #include<vector>
-#include<valarray>
 #include<cmath>
+#include<algorithm>
 
 struct COORDINATES {int x; int y;};
 struct EDGE {int i; int j;};
@@ -9,7 +9,7 @@ struct EDGE {int i; int j;};
 struct CELL
     {
     int position;
-    std::valarray<double> sensing;
+    std::vector<double> sensing;
     double last_jump_time;
     };
 
@@ -70,7 +70,7 @@ class Simulation
         return unit_rand_distribution(rng);
         }
     
-    std::valarray<double> nullify_negative_values(std::valarray<double> v)
+    std::vector<double> nullify_negative_values(std::vector<double> v)
         {
         for(size_t i=0; i<v.size(); i++)
             {
@@ -103,7 +103,7 @@ class Simulation
             }            
         }
 
-    std::valarray<double> get_neighborhood(const std::vector<double> & field, int i)
+    std::vector<double> get_neighborhood(const std::vector<double> & field, int i)
         {
         // returns the value of the field at the 
         // given coordinates, or 0 if out of bounds
@@ -214,7 +214,11 @@ class Simulation
         for(int i=0; i<n_cells; i++)
             {
             // sample neighboring concentrations
-            cells[i].sensing += get_neighborhood(state, cells[i].position) * dt/cell_jump_interval;
+            std::vector<double> neighbor_concentrations = get_neighborhood(state, cells[i].position);
+            for(int j=0; j<4; j++)
+                {
+                cells[i].sensing[j] += neighbor_concentrations[j] * dt/cell_jump_interval;
+                }
 
             // jump
             if(t - cells[i].last_jump_time >= cell_jump_interval)
@@ -230,17 +234,24 @@ class Simulation
         cell_jumped = true;
 
         // compute weights. negative values (artifacts) are treated as 0
-        std::valarray<double> weights = pow(nullify_negative_values(cell.sensing), 6);
+        std::vector<double> weights(4, 0);
+        for(int i=0;i<4;i++)
+            {
+            if (cell.sensing[i]>0)
+                {
+                weights[i] = pow(cell.sensing[i], 6.0);
+                }
+            }
         
         // handle the special case where no chemoattractant
         // is sensed by eliminating wall nodes
-        if(weights.max() == 0)
+        if(*std::max_element(weights.begin(), weights.end()))
             {
             weights = get_neighborhood(nonwalls, cell.position);
             }
 
         // drawing the new direction
-        int direction = std::discrete_distribution<int>(std::begin(weights), std::end(weights))(rng);
+        int direction = std::discrete_distribution<int>(weights.begin(), weights.end())(rng);
         
         // do the jump if the destination node is free
         int next_cell_position = compute_jump_pos(cell.position, direction); 
