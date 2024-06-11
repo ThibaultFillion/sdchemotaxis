@@ -245,7 +245,7 @@ class Simulation
         
         // handle the special case where no chemoattractant
         // is sensed by eliminating wall nodes
-        if(*std::max_element(weights.begin(), weights.end()))
+        if(*std::max_element(weights.begin(), weights.end()) == 0)
             {
             weights = get_neighborhood(nonwalls, cell.position);
             }
