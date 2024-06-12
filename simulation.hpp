@@ -294,10 +294,7 @@ class Simulation
             {
             all_cells_on_chemostats &= chstts[cells[i].position];
             }
-        if(all_cells_on_chemostats)
-            {
-            complete = true;
-            }
+        complete |= all_cells_on_chemostats;    
         }
 
     void sample_step()
