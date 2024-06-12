@@ -70,15 +70,6 @@ class Simulation
         return unit_rand_distribution(rng);
         }
     
-    std::vector<double> nullify_negative_values(std::vector<double> v)
-        {
-        for(size_t i=0; i<v.size(); i++)
-            {
-            v[i] = std::max(v[i], 0.0);
-            }
-        return v;
-        }
-
     COORDINATES get_coordinates(int node_index)
         {
         return {node_index%w, node_index/w};
