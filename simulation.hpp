@@ -379,8 +379,8 @@ class Simulation
             }        
         
         //optimization
-        this->ks *= dt; // time_step-1
-        this->kd *= dt; // time_step-1
+        this->ks *= this->dt; // time_step-1
+        this->kd *= this->dt; // time_step-1
 
         //system configuration and state
         this->w = w;
