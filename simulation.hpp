@@ -282,11 +282,7 @@ class Simulation
     void check_end_conditions()
         {
         // check t_max if necessary
-        if(t>=t_max && end_on_t_max)
-            {
-            complete = true;
-            return;
-            }
+        complete = (t>=t_max && end_on_t_max);
         
         // check if cells have reached a chemostat
         bool all_cells_on_chemostats = true;
