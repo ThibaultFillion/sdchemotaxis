@@ -365,7 +365,7 @@ class Simulation
         double node_volume = pow(node_edge, 3); // µm3
         this->cell_jump_interval = node_edge/v; // s/node_edge       
         this->ks = ks; // s-1
-        this->kd = D/pow(h,2); // s-1, diffusion rate computed according to [Bernstein2005]
+        this->kd = D/pow(node_edge,2); // s-1, diffusion rate computed according to [Bernstein2005]
 
         // time and time step
         this->t = 0;
