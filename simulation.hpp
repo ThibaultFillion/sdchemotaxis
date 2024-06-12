@@ -371,7 +371,7 @@ class Simulation
         this->t = 0;
         if(dt<=0)
             {
-            this->dt = 0.8/(4*kd+ks);
+            this->dt = 0.8/(4*this->kd+this->ks);
             }
         else
             {
