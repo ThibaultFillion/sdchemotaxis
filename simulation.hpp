@@ -46,8 +46,8 @@ class Simulation
     std::vector<double> sink; //number of sink reaction events in each node with a cell
     double t; // time
     double dt; // time step
-    double ks; // sink rate (s-1)
-    double kd; // diffusion rate (s-1)
+    double ks; // sink rate (time_step-1)
+    double kd; // diffusion rate (time_step-1)
     double cell_jump_interval; // interval at which cells jump (s-1)
     bool sample_on_cell_jump; // tells whether the state should be sampled on cell jumps
     bool sample_final_state; // tells whether the final state should be sampled
@@ -189,12 +189,12 @@ class Simulation
         // compute the number of events
         for(int i=0; i<n_edges; i++)
             {
-            diffusion_ij[i] = poisson(kd * state[edges[i].i] * dt);
-            diffusion_ji[i] = poisson(kd * state[edges[i].j] * dt);
+            diffusion_ij[i] = poisson(kd * state[edges[i].i]);
+            diffusion_ji[i] = poisson(kd * state[edges[i].j]);
             }
         for(int i=0;i<n_cells; i++)
             {
-            sink[i] = poisson(ks * state[cells[i].position] * dt);  
+            sink[i] = poisson(ks * state[cells[i].position]);  
             }
 
         // apply events
@@ -377,7 +377,11 @@ class Simulation
             {
             this->dt = dt;
             }        
-                
+        
+        //optimization
+        this->ks *= dt; // time_step-1
+        this->kd *= dt; // time_step-1
+
         //system configuration and state
         this->w = w;
         this->h = h;
