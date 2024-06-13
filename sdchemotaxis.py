@@ -23,6 +23,52 @@ References
 .. [Tweedy2020] Tweedy, L., Thomason, P. A., Paschke, P. I., Martin, K., Machesky, L. M., Zagnoni, M., & Insall, R. H. (2020). Seeing around corners: cells solve mazes and respond at a distance using attractant breakdown. Science, 369(6507), eaay9792. doi:10.1126/science.aay9792
 """
 
+def _process_landscape_array(landscape_array):
+    """
+    Returns w, h, landscape from an array landscape.
+    """
+
+    h = len(landscape_array)
+    
+    if h==0:
+        raise ValueError("landscape array cannot be empty.")
+    
+    for y in range(h):
+        if len(landscape_array[y]) != len(landscape_array[0]):
+            raise ValueError("all rows of the landscape must have the same size.")
+    
+    w = len(landscape_array[0])
+    if w==0:
+        raise ValueError("landscape rows must be larger than 0.")
+        
+    for y in range(h):
+        if not isinstance(landscape_array[y], str):
+            raise ValueError("landscape array must be an array of str only.")
+
+    return w, h, str().join(landscape_array)
+
+def _process_landscape_arguments(w, h, landscape):
+    """
+    Processes the three landscape arguments.
+    """
+
+    if isinstance(landscape, list) or isinstance(landscape, tuple) or isinstance(landscape, np.ndarray):
+        w, h, landscape = _process_landscape_array(landscape)
+    
+    if w is None :
+        raise ValueError("no value specified for w.")
+
+    if h is None :
+        raise ValueError("no value specified for h.")
+
+    if landscape is None :
+        raise ValueError("no value specified for landscape.")
+
+    if w*h != len(landscape):
+        raise ValueError("The landscape length does not match the given dimensions.")
+
+    return w, h, landscape        
+
 def count_cells(landscape):
     """
     Returns the number of cells in a given landscape.
@@ -30,9 +76,9 @@ def count_cells(landscape):
     return landscape.count("o")
         
 def plot_landscape(
-        w, 
-        h, 
-        landscape, 
+        w = None, 
+        h = None, 
+        landscape = None, 
         ax=None, 
         colors={
             "wall": "grey", 
@@ -44,7 +90,10 @@ def plot_landscape(
     """
     Plots the landscape (of dimensions w*h).
     ax(optionnal) is the Matplotlib axis to be used.
+    See simulate for the descrition of the three arguments.
     """
+    w, h, landscape = _process_landscape_arguments(w, h, landscape)
+            
     if ax is None :
         ax = plt.gca()
     ax.set_title("landscape")
@@ -288,9 +337,9 @@ class Output:
         plt.colorbar(im, label="visit frequency")
         
 def simulate(
-    w, 
-    h,
-    landscape,
+    w=None, 
+    h=None,
+    landscape=None,
     sample_on_cell_jump = True,
     sample_final_state = True,
     sampling_interval = -1,
@@ -307,10 +356,19 @@ def simulate(
     ):
     """
     Run simulations of cell migration in a given landscape with some set of parameters.
+    There are two ways to call this functions:
+    with, the landscape as a str, and explicit width and height, i.e.
+
+        simulate(2,2,"o..*") 
     
-    * w: width of the system (in nodes)
-    * h: height of the system (in nodes)
-    * landscape: description of the landscape at initial state (str).
+    or with the landscape as an array, in keyword argument, and no width and height (determined automatically), i.e.
+    
+        simulate(landscape=["o.",
+                            ".*"]) 
+    
+    * w: width of the system (in nodes, default=None)
+    * h: height of the system (in nodes, default=None)
+    * landscape: description of the landscape at initial state (str, default=None).
     * sample_on_cell_jump: should the trajectories be sampled on cell jump? (bool, default=True)
     * sample_final_state: should the trajectories be sampled when the end condition is met? (bool, default=True)
     * sampling_interval: interval at which trajectories should be sampled. 
@@ -326,8 +384,7 @@ def simulate(
     * rng_seeds: seeds for the pseudo-random number generator (list of n_runs values). if None, they are generated. (default=None)
     * n_runs: Number of runs to be performed (default=1).
     """
-    if w*h != len(landscape):
-        raise ValueError("The landscape length does not match the given dimensions.")
+    w, h, landscape = _process_landscape_arguments(w, h, landscape)
     
     if rng_seeds is None:
         rng_seeds = [int(random.random()*1000000) for i in range(n_runs)]
