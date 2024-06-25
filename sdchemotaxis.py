@@ -512,7 +512,7 @@ def load_output(path):
         _state_trajs[i] = data["s"+str(i)]
         _times[i]       = data["t"+str(i)]
         
-    Output(
+    return Output(
         info["w"],
         info["h"],
         info["landscape"],
