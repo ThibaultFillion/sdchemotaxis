@@ -39,7 +39,7 @@ def get_mask(landscape, mask_symbol="-"):
        )
 
     where "-" chracters represent 
-    the masked cells, would return:
+    the masked nodes, would return:
         
     [0,0,1,
      0,0,1,
